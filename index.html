@@ -17,6 +17,12 @@
             margin: 0;
         }
 
+        .container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+
         .terminal {
             background-color: #000;
             border: 1px solid #555;
@@ -54,19 +60,57 @@
             flex-grow: 1;
             padding: 5px;
         }
+
+        .preview {
+            background-color: #1e1e1e;
+            border: 1px solid #555;
+            border-radius: 5px;
+            max-width: 300px;
+            width: 100%;
+            height: 400px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .preview img {
+            max-width: 100px;
+            border-radius: 50%;
+        }
+
+        .preview h2 {
+            margin: 10px 0;
+            font-size: 1.2em;
+        }
+
+        .preview p {
+            font-size: 1em;
+            color: #ccc;
+        }
     </style>
 </head>
 <body>
-    <div class="terminal">
-        <div class="output" id="output"></div>
-        <div class="input-line">
-            <span id="prompt">></span>
-            <input type="text" id="input" autofocus autocomplete="off">
+    <div class="container">
+        <div class="terminal">
+            <div class="output" id="output"></div>
+            <div class="input-line">
+                <span id="prompt">></span>
+                <input type="text" id="input" autofocus autocomplete="off">
+            </div>
+        </div>
+        <div class="preview" id="preview">
+            <img src="" id="previewAvatar" alt="Avatar">
+            <h2 id="previewUsername">Username</h2>
+            <p id="previewMessage">Message</p>
         </div>
     </div>
     <script>
         const outputElement = document.getElementById('output');
         const inputElement = document.getElementById('input');
+        const previewAvatar = document.getElementById('previewAvatar');
+        const previewUsername = document.getElementById('previewUsername');
+        const previewMessage = document.getElementById('previewMessage');
 
         let webhookUrl = '';
         let username = '';
@@ -119,6 +163,7 @@ Please follow the instructions below:
 
                         case 'username':
                             username = input;
+                            previewUsername.textContent = username;
                             output('Username set. Please enter the avatar URL.');
                             mode = 'avatar';
                             break;
@@ -126,6 +171,7 @@ Please follow the instructions below:
                         case 'avatar':
                             if (isValidUrl(input)) {
                                 avatarUrl = input;
+                                previewAvatar.src = avatarUrl;
                                 output('Avatar URL set. Please enter the message.');
                                 mode = 'message';
                             } else {
@@ -135,6 +181,7 @@ Please follow the instructions below:
 
                         case 'message':
                             message = input;
+                            previewMessage.textContent = message;
                             if (mode === 'spam') {
                                 startSpam();
                                 output('Spam started. Type "stop" to stop spamming.');
@@ -162,6 +209,7 @@ Please follow the instructions below:
                                 inputElement.disabled = true;
                             } else {
                                 await sendMessage(webhookUrl, username, input, avatarUrl);
+                                previewMessage.textContent = input;
                                 output('Message sent. Please enter a new message or type "exit" to finish.');
                             }
                             break;
